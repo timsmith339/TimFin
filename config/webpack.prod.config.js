@@ -8,9 +8,13 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.ts|.tsx?$/,
                 loader: 'ts-loader',
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.scss$/,
+                loader: 'style-loader!css-loader!sass-loader'
             }
         ]
     },
@@ -25,7 +29,7 @@ module.exports = {
     output: {
         path: __dirname + '/../dist/',
         filename: 'bundle.js',
-        publicPath : 'dist'
+        publicPath : './dist'
     }
 
 };

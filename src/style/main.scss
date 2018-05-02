@@ -1,3 +1,7 @@
-.main {
-    background-color: red;
+@import "./bootstrap/bootstrap";
+
+.sidebar {
+  box-shadow: 4px 0 5px 0 rgba(200,200,200,1);
+  height: 100vh;
+  overflow: hidden;
 }

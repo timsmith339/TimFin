@@ -1,10 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 import {connect} from "react-redux";
 import {GlobalState} from "../redux/store";
+import {getAccounts, getCategories} from "../lib/comms";
 
 interface CounterCompProps {
-    onDecrement: () => void,
-    onIncrement: () => void
+    onDecrement: () => void;
+    onIncrement: () => void;
 }
 
 class CounterComp extends React.Component<CounterCompOwnProps, {}> {
@@ -12,29 +13,29 @@ class CounterComp extends React.Component<CounterCompOwnProps, {}> {
         super(props);
     }
 
-    render () {
+    render() {
         const { currentCount, onDecrement, onIncrement } = this.props;
 
         return (
             <div>
-                <button onClick={onDecrement}>DECREMENT</button>
-                <span>{ currentCount } </span>
-                <button onClick={onIncrement}>INCREMENT</button>
+                <button onClick={onDecrement}> - </button>
+                <span style={{paddingLeft: "10px", paddingRight: "10px"}}> { currentCount } </span>
+                <button onClick={onIncrement}> + </button>
             </div>
-        )
+        );
     }
 }
 
 interface CounterCompOwnProps extends CounterCompProps {
-    currentCount: number
+    currentCount: number;
 }
 
 function mapStateToProps(state: GlobalState, ownProps: CounterCompProps): CounterCompOwnProps {
     return {
+        currentCount: state.app.count,
         onDecrement: ownProps.onDecrement,
         onIncrement: ownProps.onIncrement,
-        currentCount: state.app.count
-    }
+    };
 }
 
 export default connect(mapStateToProps)(CounterComp);

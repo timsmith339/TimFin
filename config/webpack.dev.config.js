@@ -9,13 +9,17 @@ module.exports = {
         "./src/index.tsx"
     ],
     mode: 'development',
-    devtool: 'eval',
+    devtool: "inline-source-map",
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
+                test: /\.ts|.tsx?$/,
                 loader: 'ts-loader',
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.scss$/,
+                loader: 'style-loader!css-loader!sass-loader'
             }
         ]
     },

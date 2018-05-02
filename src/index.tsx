@@ -1,6 +1,3 @@
-
-
-//import "../scss/main.scss";
 // Import React and React DOM
 import * as React from "react";
 import {render} from "react-dom";
@@ -8,7 +5,6 @@ import App from "./App";
 
 // Import the Hot Module Reloading App Container – more on why we use 'require' below
 const { AppContainer } = require('react-hot-loader');
-
 
 // Tell Typescript that there is a global variable called module - see below
 declare var module: { hot: any };
@@ -37,5 +33,5 @@ if (module.hot) {
             </AppContainer>,
             rootEl
         );
-    })
+    });
 }

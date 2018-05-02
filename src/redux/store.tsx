@@ -9,7 +9,7 @@ import {
 import appReducer, {AppState, NAME as APP_NAME} from "./app-module";
 
 export interface GlobalState {
-    app: AppState
+    app: AppState;
 }
 
 const reducers = combineReducers({
