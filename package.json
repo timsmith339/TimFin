@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack --config config/webpack.prod.config.js --optimize-minimize --optimize-dedupe",
     "start": "node server.js",
-    "dev": "webpack-dev-server -w --hot --inline --config config/webpack.dev.config.js --host 0.0.0.0"
+    "dev": "webpack-dev-server -w --hot --inline --config config/webpack.dev.config.js --host 0.0.0.0",
+    "deploy": "git push heroku master"
   },
   "author": "",
   "license": "ISC",
