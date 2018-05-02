@@ -28,9 +28,9 @@ module.exports = {
         extensions: [ '.ts', '.tsx', '.js'],
     },
     output: {
-        path: __dirname + '/../dist/',
+        path: __dirname + '/../public/dist/',
         filename: 'bundle.js',
-        publicPath : 'dist'
+        publicPath : 'public/dist'
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -40,7 +40,7 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin()
     ],
     devServer: {
-        contentBase: './',
+        contentBase: './public/',
         hot: true
       },
 
