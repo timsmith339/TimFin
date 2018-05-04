@@ -20,7 +20,7 @@ class AccountsComp extends React.Component<AccountsCompOwnProps, {}> {
     render() {
         const { accounts, selectedAccount } = this.props;
 
-        return <div>
+        return <section>
             <h2>Accounts</h2>
             <div>
                 { accounts.map(account => {
@@ -31,7 +31,7 @@ class AccountsComp extends React.Component<AccountsCompOwnProps, {}> {
                     >{account.name}</div>;
                 })}
             </div>
-        </div>;
+        </section>;
     }
 }
 

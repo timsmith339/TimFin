@@ -2,3 +2,16 @@
 @import "categories";
 @import "transactions";
 
+button,
+select,
+input {
+  border: 1px solid $gray-500;
+  border-radius: 5px;
+  margin: 2px 2px 0 0;
+  padding: 3px;
+  background: white;
+}
+
+section {
+  padding: 5px 5px 8px 5px;
+}

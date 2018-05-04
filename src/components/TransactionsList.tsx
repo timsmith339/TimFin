@@ -38,7 +38,7 @@ class TransactionsList extends React.Component<TransactionsListCompProps, { tz: 
     render() {
         const { transactions } = this.props;
 
-        return <div className={"transactions-list"}>
+        return <section className={"transactions-list"}>
             <h2>Transactions</h2>
             <div>
                 <table>
@@ -65,7 +65,7 @@ class TransactionsList extends React.Component<TransactionsListCompProps, { tz: 
                     </tbody>
                 </table>
             </div>
-        </div>;
+        </section>;
     }
 }
 

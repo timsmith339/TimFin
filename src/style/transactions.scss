@@ -1,9 +1,10 @@
+@import "variables";
+
 .transactions-list {
   td {
     padding-right: 10px;
   }
   tr:nth-child(even) {
-    // background-color: #badafc;
-     background-color: palevioletred;
+     background-color: $light-blue;
   }
 }

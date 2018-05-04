@@ -49,7 +49,7 @@ class CategoriesComp extends React.Component<CategoriesCompOwnProps, CategoriesC
         const { newCategoryName } = this.state;
 
         return (
-            <div>
+            <section>
                 <h2>Categories</h2>
                 <div>
                     { categories.map(cat => {
@@ -68,7 +68,7 @@ class CategoriesComp extends React.Component<CategoriesCompOwnProps, CategoriesC
                            onKeyPress={this.newCatKeyUp}
                     />
                 </div>
-            </div>
+            </section>
         );
     }
 }

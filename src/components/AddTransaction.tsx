@@ -75,8 +75,8 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
     render() {
         const { categories } = this.props;
         const { category, date, description, amount } = this.state;
-        return <div>
-            <h2>Add a new TXN</h2>
+        return <section>
+            <h2>Add Transaction</h2>
             <div>
                 <select ref={ref => this.catSelect = ref}
                         value={JSON.stringify(category)}
@@ -93,7 +93,7 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
                 <input type="number" min="0.01" step="0.01" max="9999" value={amount} onChange={this.onChangeAmount} />
                 <button onClick={this.submitTransaction}>GO</button>
             </div>
-        </div>;
+        </section>;
     }
 }
 
