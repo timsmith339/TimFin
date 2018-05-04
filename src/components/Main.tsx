@@ -1,48 +1,68 @@
 import * as React from "react";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
-import {Switch, Route, Link} from "react-router-dom";
-import Home from "./Home";
-import CategoriesPage from "./CategoriesPage";
+import CategoriesComp from "./CategoriesComp";
+import { getAccounts, getCategories } from "../lib/comms";
+import { Category, Account } from "../timfin-types";
+import { loadCategories } from "../redux/category-module";
+import {getSelectedAccount, loadAccounts} from "../redux/account-module";
+import AccountsComp from "./AccountsComp";
+import TransactionsList from "./TransactionsList";
+import AddTransaction from "./AddTransaction";
+import {GlobalState} from "../redux/store";
 
-class Main extends React.Component<DispatchFromProps, {}> {
-    constructor(props: DispatchFromProps) {
+class Main extends React.Component<MainCompProps, {}> {
+    constructor(props: MainCompProps) {
         super(props);
     }
 
+    componentWillMount() {
+        getCategories().then(categories => {
+            this.props.loadCategories(categories);
+        });
+        getAccounts().then((accounts) => {
+            this.props.loadAccounts(accounts);
+        });
+    }
+
     render() {
+        const { selectedAccount } = this.props;
+
         return (
-            <div className={"row main"}>
-                <div className={"col-sm-2 sidebar"}>
-                    <Link to={"/"}>Home</Link>
-                    <Link to={"/categories"}>Categories</Link>
-                </div>
-                <div className={"col-sm-10"}>
+            <div className={"main"}>
+                <AccountsComp />
+                <CategoriesComp />
 
-                    <Switch>
-                        <Route exact path="/" component={Home}/>
-                        <Route path="/categories" component={CategoriesPage}/>
-                        {/* both /roster and /roster/:number begin with /roster */}
-                        {/*<Route path="/roster" component={Roster}/>*/}
-                    </Switch>
-
-                </div>
+                {selectedAccount &&
+                <AddTransaction/>
+                }
+                {selectedAccount &&
+                <TransactionsList/>
+                }
             </div>
         );
     }
 }
 
-interface DispatchFromProps {
-    // increment: () => void;
-    // decrement: () => void;
+interface MainCompProps extends MainCompOwnProps, DispatchFromProps {}
+interface MainCompOwnProps {
+    selectedAccount?: Account;
 }
 
+interface DispatchFromProps {
+    loadCategories: (categories: Category[]) => void;
+    loadAccounts: (accounts: Account[]) => void;
+}
+
+const mapStateToProps = (state: GlobalState) => ({
+    selectedAccount: getSelectedAccount(state)
+});
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    // decrement: () => dispatch(decCount()),
-    // increment: () => dispatch(incCount())
+    loadCategories: (categories: Category[]) => dispatch(loadCategories(categories)),
+    loadAccounts: (accounts: Account[]) => dispatch(loadAccounts(accounts))
 });
 
-export default connect<void, DispatchFromProps>(
-    null,
+export default connect<MainCompOwnProps, DispatchFromProps>(
+    mapStateToProps,
     mapDispatchToProps
 )(Main);

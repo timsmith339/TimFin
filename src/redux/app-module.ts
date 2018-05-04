@@ -26,9 +26,5 @@ export default function reducer(state: AppState = {
 }
 
 // Action Creators --------------------------------------------------
-export function incCount() {
-    return {type: INC_COUNT};
-}
-export function decCount() {
-    return {type: DEC_COUNT};
-}
+export const incCount = () => ({type: INC_COUNT});
+export const decCount = () => ({type: DEC_COUNT});

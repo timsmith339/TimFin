@@ -1,4 +1,6 @@
 const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: [
@@ -26,6 +28,10 @@ module.exports = {
         ],
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
+    plugins: [
+        new CleanWebpackPlugin(['dist'], { root: path.resolve(__dirname, '..') }),
+        new UglifyJsPlugin()
+    ],
     output: {
         path: __dirname + '/../dist/',
         filename: 'bundle.js',
