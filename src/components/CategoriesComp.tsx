@@ -50,7 +50,7 @@ class CategoriesComp extends React.Component<CategoriesCompOwnProps, CategoriesC
 
         return (
             <div>
-                <h1>Categories</h1>
+                <h2>Categories</h2>
                 <div>
                     { categories.map(cat => {
                         const className = selectedCategory && cat.id === selectedCategory.id ? "active" : "";

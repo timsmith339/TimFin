@@ -21,7 +21,7 @@ class AccountsComp extends React.Component<AccountsCompOwnProps, {}> {
         const { accounts, selectedAccount } = this.props;
 
         return <div>
-            <h1>Accounts</h1>
+            <h2>Accounts</h2>
             <div>
                 { accounts.map(account => {
                     const className = selectedAccount && account.id === selectedAccount.id ? "active" : "";

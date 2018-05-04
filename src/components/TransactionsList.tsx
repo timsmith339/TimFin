@@ -38,8 +38,8 @@ class TransactionsList extends React.Component<TransactionsListCompProps, { tz: 
     render() {
         const { transactions } = this.props;
 
-        return <div>
-            <h1>Transactions</h1>
+        return <div className={"transactions-list"}>
+            <h2>Transactions</h2>
             <div>
                 <table>
                     <thead>

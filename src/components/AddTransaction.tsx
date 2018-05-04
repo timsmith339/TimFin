@@ -76,7 +76,7 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
         const { categories } = this.props;
         const { category, date, description, amount } = this.state;
         return <div>
-            <h3>Add a new TXN</h3>
+            <h2>Add a new TXN</h2>
             <div>
                 <select ref={ref => this.catSelect = ref}
                         value={JSON.stringify(category)}
