@@ -3,8 +3,8 @@ import {Account, Category, Transaction} from "../timfin-types";
 import * as moment from "moment";
 import * as tz from "moment-timezone";
 
-// const baseUrl = "https://timfinapi.herokuapp.com/api";
-const baseUrl = "http://0.0.0.0:3001/api";
+const baseUrl = "https://timfinapi.herokuapp.com/api";
+// const baseUrl = "http://0.0.0.0:3001/api";
 
 export function getAccounts(): Promise<Account[]> {
     return new Promise((resolve, reject) => {
