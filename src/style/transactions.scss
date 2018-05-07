@@ -1,10 +1,29 @@
 @import "variables";
 
 .transactions-list {
-  td {
+  //display: table;
+
+  &--row {
+    //display: table-row;
+  }
+  &--row:nth-child(odd) {
+    background-color: $light-blue;
+  }
+  &--column {
+    //display: table-cell;
     padding-right: 10px;
   }
-  tr:nth-child(even) {
-     background-color: $light-blue;
+}
+
+.transaction {
+
+  &--debit {
+    color: $negative-red;
+  }
+
+  &--credit {
+    color: $positive-green;
   }
 }
+
+

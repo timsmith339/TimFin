@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as moment from "moment";
 import * as tz from "moment-timezone";
-import {Account, Category, Transaction} from "../timfin-types";
+import {Account, Category, Transaction, TransactionType} from "../timfin-types";
 import {GlobalState} from "../redux/store";
 import {getCategories, getSelectedCategory} from "../redux/category-module";
 import {connect} from "react-redux";
@@ -12,8 +12,9 @@ import {loadTransaction} from "../redux/transaction-module";
 
 interface AddTransactionState {
     timezone: string;
+    transaction_type: TransactionType;
     category: Category;
-    date: string;
+    date: moment.Moment;
     description: string;
     amount: number;
 }
@@ -26,8 +27,9 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
 
         this.state = {
             timezone: tz.tz.guess(),
+            transaction_type: "debit",
             category: props.selectedCategory ? props.selectedCategory : null,
-            date: moment(Date()).format("YYYY-MM-DD"),
+            date: moment().local(),
             description: "",
             amount: 0.00
         };
@@ -37,6 +39,7 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeDate = this.onChangeDate.bind(this);
         this.onChangeAmount = this.onChangeAmount.bind(this);
+        this.onChangeType = this.onChangeType.bind(this);
     }
 
     componentWillReceiveProps(nextProps: PropsFromState) {
@@ -46,9 +49,10 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
     }
 
     submitTransaction() {
-        const { category, date, description, amount } = this.state;
+        const { category, date, description, amount, transaction_type } = this.state;
         const newTransaction: Transaction = {
-            timestamp: new Date(moment(date).tz(this.state.timezone).toString()),
+            transaction_type,
+            timestamp: date,
             amount,
             description,
             account: this.props.selectedAccount,
@@ -63,7 +67,7 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
         this.setState({ category: JSON.parse(e.currentTarget.value) });
     }
     onChangeDate(e: React.FormEvent<HTMLInputElement>) {
-        this.setState({ date: e.currentTarget.value });
+        this.setState({ date: moment(e.currentTarget.value) });
     }
     onChangeDescription(e: React.FormEvent<HTMLInputElement>) {
         this.setState({ description: e.currentTarget.value });
@@ -71,10 +75,15 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
     onChangeAmount(e: React.FormEvent<HTMLInputElement>) {
         this.setState({ amount: Number(e.currentTarget.value) });
     }
+    onChangeType(e: React.FormEvent<HTMLInputElement>) {
+        /* I did (e.target as any) because .value doesn't exist on this interface.  I have the wrong event type,
+           and I'm not sure what it's supposed to be*/
+        this.setState({ transaction_type: (e.target as any).value });
+    }
 
     render() {
         const { categories } = this.props;
-        const { category, date, description, amount } = this.state;
+        const { category, date, description, amount, transaction_type } = this.state;
         return <section>
             <h2>Add Transaction</h2>
             <div>
@@ -88,9 +97,19 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
                         })
                     }
                 </select>
-                <input type="date" value={date} onChange={this.onChangeDate} />
+                <input type="date" value={date.format("YYYY-MM-DD")} onChange={this.onChangeDate} />
                 <input type="text" placeholder="description" value={description} onChange={this.onChangeDescription} />
                 <input type="number" min="0.01" step="0.01" max="9999" value={amount} onChange={this.onChangeAmount} />
+                <span onChange={this.onChangeType}>
+                    <label><span>D </span><input type="radio"
+                                                 name="transaction_type"
+                                                 value="debit"
+                                                 defaultChecked={transaction_type === "debit"}/></label>
+                    <label><span>C </span><input type="radio"
+                                                 name="transaction_type"
+                                                 value="credit"
+                                                 defaultChecked={transaction_type === "credit"} /></label>
+                </span>
                 <button onClick={this.submitTransaction}>GO</button>
             </div>
         </section>;

@@ -1,3 +1,5 @@
+import {Moment} from "moment";
+
 export interface Account {
     id: string;
     name: string;
@@ -8,12 +10,16 @@ export interface Category {
     name: string;
 }
 
+export type TransactionType = "credit" | "debit";
+
 export interface Transaction {
     id?: string;
-    timestamp: Date;
+    transaction_type: TransactionType;
+    timestamp: Moment;
     amount: number;
     description: string;
     note?: string;
     account: Account;
     category: Category;
+    created?: Moment;
 }
