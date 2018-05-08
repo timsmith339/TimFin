@@ -10,6 +10,7 @@ import AccountsComp from "./AccountsComp";
 import TransactionsList from "./TransactionsList";
 import AddTransaction from "./AddTransaction";
 import {GlobalState} from "../redux/store";
+import StatisticsComp from "./Statistics";
 
 class Main extends React.Component<MainCompProps, {}> {
     constructor(props: MainCompProps) {
@@ -29,15 +30,23 @@ class Main extends React.Component<MainCompProps, {}> {
         const { selectedAccount } = this.props;
 
         return (
-            <div className={"main"}>
-                <AccountsComp />
-                <CategoriesComp />
+            <div className={"main row"}>
+                <div className="col-md-2">
+                    <AccountsComp />
+                    <CategoriesComp />
+                </div>
 
                 {selectedAccount &&
-                <AddTransaction/>
+                <div className="col-md-4">
+                    <AddTransaction/>
+                    <TransactionsList/>
+                </div>
                 }
+
                 {selectedAccount &&
-                <TransactionsList/>
+                <div className="col-md-6">
+                    <StatisticsComp/>
+                </div>
                 }
             </div>
         );

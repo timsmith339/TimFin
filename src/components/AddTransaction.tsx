@@ -99,7 +99,6 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
                 </select>
                 <input type="date" value={date.format("YYYY-MM-DD")} onChange={this.onChangeDate} />
                 <input type="text" placeholder="description" value={description} onChange={this.onChangeDescription} />
-                <input type="number" min="0.01" step="0.01" max="9999" value={amount} onChange={this.onChangeAmount} />
                 <span onChange={this.onChangeType}>
                     <label><span>D </span><input type="radio"
                                                  name="transaction_type"
@@ -110,6 +109,7 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
                                                  value="credit"
                                                  defaultChecked={transaction_type === "credit"} /></label>
                 </span>
+                <input type="number" min="0" max="9999" value={amount} onChange={this.onChangeAmount} />
                 <button onClick={this.submitTransaction}>GO</button>
             </div>
         </section>;

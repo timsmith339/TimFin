@@ -1,8 +1,9 @@
-import {Transaction} from "../timfin-types";
+import {Category, Transaction, TransactionStatistics} from "../timfin-types";
 import {GlobalState} from "./store";
 import {createSelector} from "reselect";
 import {TransactionSearchCriteria} from "../lib/comms";
 import * as moment from "moment";
+import Statistics from "../lib/statistics";
 
 export const NAME = "transactions";
 
@@ -10,6 +11,7 @@ export interface TransactionState {
     transactions: Transaction[];
     selectedId?: string;
     searchCriteria: TransactionSearchCriteria;
+    stats: TransactionStatistics;
 }
 
 // Actions
@@ -27,18 +29,29 @@ export default function reducer(state: TransactionState = {
     searchCriteria: {
         startDate: moment().startOf("month"),
         endDate: moment().endOf("month")
+    },
+    stats: {
+        count: 0,
+        total: 0,
+        categorySubtotals: { }
     }
 },                              action: any): TransactionState {
     switch (action.type) {
-        case LOAD_TRANSACTIONS:
-            return Object.assign({}, state, { transactions: action.transactions });
-        case LOAD_TRANSACTION:
+        case LOAD_TRANSACTIONS: {
+            const {transactions} = action;
+            const stats = Statistics.calculateStats(transactions);
+            return Object.assign({}, state, {transactions, stats});
+        }
+        case LOAD_TRANSACTION: {
             const newTransaction = action.transaction;
             if (state.transactions.find(c => c.id === newTransaction.id)) {
                 return state;
             } else {
-                return Object.assign({}, state, { transactions: state.transactions.concat(newTransaction) });
+                const transactions = state.transactions.concat(newTransaction);
+                const stats = Statistics.calculateStats(transactions);
+                return Object.assign({}, state, {transactions, stats});
             }
+        }
         case REMOVE_TRANSACTION:
             return Object.assign({}, state, { transactions: state.transactions.filter(t => t.id !== action.transaction.id) });
         case SET_SELECTED_TRANSACTION:
@@ -63,17 +76,14 @@ export const setTransactionSearchCriteria = (criteria: TransactionSearchCriteria
 
 // Selectors
 const getAll = (state: GlobalState): TransactionState => state[NAME];
-export const getTransactions = createSelector(getAll, state => {
-    return state.transactions.sort((a, b) => a.timestamp <= b.timestamp ? -1 : 1);
-});
 export const getTransactionsReversed = createSelector(getAll, state => {
     return state.transactions.sort((a, b) => {
         // If  they're the same day, sort by created
         if (a.timestamp.isSame(b.timestamp, "d")) {
-            return a.timestamp > b.timestamp ? -1 : 1;
+            return a.created > b.created ? -1 : 1;
         // If they're different days, then sort by timestamp
         } else {
-            return a.created > b.created ? -1 : 1;
+            return a.timestamp > b.timestamp ? -1 : 1;
         }
     });
 });

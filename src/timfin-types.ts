@@ -22,4 +22,13 @@ export interface Transaction {
     account: Account;
     category: Category;
     created?: Moment;
+    categoryId?: string;
+}
+
+export interface CategorySubtotal { [categoryId: string]: number; }
+
+export interface TransactionStatistics {
+    count: number;
+    total: number;
+    categorySubtotals: CategorySubtotal;
 }
