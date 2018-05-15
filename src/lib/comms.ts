@@ -40,6 +40,18 @@ export function addCategory(name: string, budget?: number): Promise<Category> {
     });
 }
 
+export function updateCategory(category: Category): Promise<Category> {
+    return new Promise((resolve, reject) => {
+        axios.put(`${baseUrl}/categories`, category)
+            .then((response) => {
+                const res = response.data as Category;
+                resolve(res);
+            }, (error) => {
+                reject(error);
+            });
+    });
+}
+
 export interface TransactionSearchCriteria {
     account?: Account;
     category?: Category;
@@ -102,6 +114,29 @@ export function postNewTransaction(transaction: Transaction): Promise<Transactio
                     }, (error) => {
                         reject(error);
                     });
+            }, (error) => {
+                reject(error);
+            });
+    });
+}
+
+export function updateTransaction(transaction: Transaction): Promise<Transaction> {
+    return new Promise((resolve, reject) => {
+        const payload = {
+            id: transaction.id,
+            accountId: transaction.account.id,
+            transaction_type: transaction.transaction_type,
+            categoryId: transaction.category.id,
+            timestamp: transaction.timestamp.utc().toISOString(),
+            created: transaction.created,
+            amount: transaction.amount,
+            description: transaction.description,
+            note: transaction.note
+        };
+        axios.put(`${baseUrl}/transactions`, payload)
+            .then((response) => {
+                const res = response.data as Transaction;
+                resolve(Object.assign({}, res, { timestamp: moment(res.timestamp).local() }));
             }, (error) => {
                 reject(error);
             });

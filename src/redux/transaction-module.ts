@@ -11,7 +11,7 @@ export interface TransactionState {
     transactions: Transaction[];
     selectedId?: string;
     searchCriteria: TransactionSearchCriteria;
-    stats: TransactionStatistics;
+//    stats: TransactionStatistics;
 }
 
 // Actions
@@ -30,11 +30,11 @@ export default function reducer(state: TransactionState = {
         startDate: moment().startOf("month"),
         endDate: moment().endOf("month")
     },
-    stats: {
-        count: 0,
-        total: 0,
-        categorySubtotals: { }
-    }
+    // stats: {
+    //     count: 0,
+    //     total: 0,
+    //     categorySubtotals: { }
+    // }
 },                              action: any): TransactionState {
     switch (action.type) {
         case LOAD_TRANSACTIONS: {
@@ -45,7 +45,9 @@ export default function reducer(state: TransactionState = {
         case LOAD_TRANSACTION: {
             const newTransaction = action.transaction;
             if (state.transactions.find(c => c.id === newTransaction.id)) {
-                return state;
+                return Object.assign({}, state, {transactions: state.transactions.map(t => {
+                        return t.id === newTransaction.id ? Object.assign({}, t, newTransaction) : t;
+                    })});
             } else {
                 const transactions = state.transactions.concat(newTransaction);
                 const stats = Statistics.calculateStats(transactions);
@@ -90,4 +92,7 @@ export const getTransactionsReversed = createSelector(getAll, state => {
 export const getSelectedTransaction = createSelector(getAll, (state) => {
     const { transactions, selectedId } = state;
     return selectedId ? transactions.find(transaction => transaction.id === selectedId) : null;
+});
+export const getTransactionStats = createSelector(getAll, (state) => {
+    return  Statistics.calculateStats(state.transactions);
 });

@@ -14,9 +14,7 @@ const rootEl = document.getElementById('app');
 
 // And render our App into it, inside the HMR App Container which handles the hot reloading
 render(
-    <AppContainer>
-        <App />
-    </AppContainer>,
+    <App />,
     rootEl
 );
 
@@ -28,9 +26,7 @@ if (module.hot) {
 
         // And render it into the root element again
         render(
-            <AppContainer>
-                <NextApp />
-            </AppContainer>,
+            <NextApp />,
             rootEl
         );
     });

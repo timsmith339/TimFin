@@ -1,22 +1,21 @@
 @import "variables";
 
-.transactions-list {
+table {
   //display: table;
 
-  &--row {
+  tr {
     //display: table-row;
   }
-  &--row:nth-child(odd) {
+  tr:nth-child(even) {
     background-color: $light-blue;
   }
-  &--column {
+  td {
     //display: table-cell;
     padding-right: 10px;
   }
 }
 
 .transaction {
-
   &--debit {
     color: $negative-red;
   }

@@ -75,42 +75,48 @@ class AddTransaction extends React.Component<AddTransactionCompProps, AddTransac
     onChangeAmount(e: React.FormEvent<HTMLInputElement>) {
         this.setState({ amount: Number(e.currentTarget.value) });
     }
-    onChangeType(e: React.FormEvent<HTMLInputElement>) {
-        /* I did (e.target as any) because .value doesn't exist on this interface.  I have the wrong event type,
-           and I'm not sure what it's supposed to be*/
-        this.setState({ transaction_type: (e.target as any).value });
+    onChangeType(e: React.FormEvent<HTMLButtonElement>) {
+        this.setState({ transaction_type: e.currentTarget.value as TransactionType });
     }
 
     render() {
         const { categories } = this.props;
         const { category, date, description, amount, transaction_type } = this.state;
+        const debitButtonClass = transaction_type === "debit" ? "danger" : "default";
+        const creditButtonClass = transaction_type === "credit" ? "success" : "default";
+
         return <section>
             <h2>Add Transaction</h2>
-            <div>
-                <select ref={ref => this.catSelect = ref}
-                        value={JSON.stringify(category)}
-                        onChange={this.onSelectCategory} >
-                    <option value="">category...</option>
-                    {
-                        categories.map((cat) => {
-                            return <option key={cat.id} value={JSON.stringify(cat)}>{cat.name}</option>;
-                        })
-                    }
-                </select>
-                <input type="date" value={date.format("YYYY-MM-DD")} onChange={this.onChangeDate} />
-                <input type="text" placeholder="description" value={description} onChange={this.onChangeDescription} />
-                <span onChange={this.onChangeType}>
-                    <label><span>D </span><input type="radio"
-                                                 name="transaction_type"
-                                                 value="debit"
-                                                 defaultChecked={transaction_type === "debit"}/></label>
-                    <label><span>C </span><input type="radio"
-                                                 name="transaction_type"
-                                                 value="credit"
-                                                 defaultChecked={transaction_type === "credit"} /></label>
-                </span>
-                <input type="number" min="0" max="9999" value={amount} onChange={this.onChangeAmount} />
-                <button onClick={this.submitTransaction}>GO</button>
+            <div className={"form-group row"}>
+                <div className="col-xs-2">
+                    <select className="form-control form-control-sm"
+                            ref={ref => this.catSelect = ref}
+                            value={JSON.stringify(category)}
+                            onChange={this.onSelectCategory} >
+                        <option value="">category...</option>
+                        {
+                            categories.map((cat) => {
+                                return <option key={cat.id} value={JSON.stringify(cat)}>{cat.name}</option>;
+                            })
+                        }
+                    </select>
+                </div>
+                <div className="col-xs-2">
+                    <input className="form-control form-control-sm" type="date" value={date.format("YYYY-MM-DD")} onChange={this.onChangeDate} />
+                </div>
+                <div className="col-xs-2">
+                    <input className="form-control form-control-sm" type="text" placeholder="description" value={description} onChange={this.onChangeDescription} />
+                </div>
+                <div className="col-xs-2">
+                    <span onChange={this.onChangeType}>
+                         <button onClick={this.onChangeType} value="debit" className={`btn btn-${debitButtonClass} btn-sm`}> D </button>
+                         <button onClick={this.onChangeType} value="credit" className={`btn btn-${creditButtonClass} btn-sm`}> C </button>
+                    </span>
+                </div>
+                <div className="col-xs-2">
+                    <input className="form-control form-control-sm" type="number" min="0" max="9999" value={amount} onChange={this.onChangeAmount} />
+                </div>
+                <button className="btn btn-primary btn-sm" onClick={this.submitTransaction}>GO</button>
             </div>
         </section>;
     }

@@ -26,7 +26,9 @@ export default function reducer(state: CategoryState = {
         case LOAD_CATEGORY: {
             const newCategory = action.category;
             if (state.categories.find(c => c.id === newCategory.id)) {
-                return state;
+                return Object.assign({}, state, {categories: state.categories.map(c => {
+                    return c.id === newCategory.id ? newCategory : c;
+                })});
             } else {
                 return Object.assign({}, state, { categories: state.categories.concat(newCategory) });
             }

@@ -8,6 +8,7 @@ export interface Account {
 export interface Category {
     id: string;
     name: string;
+    budget: number;
 }
 
 export type TransactionType = "credit" | "debit";
@@ -21,14 +22,18 @@ export interface Transaction {
     note?: string;
     account: Account;
     category: Category;
-    created?: Moment;
+    created?: string;
     categoryId?: string;
 }
 
-export interface CategorySubtotal { [categoryId: string]: number; }
+export interface CategorySubtotal {
+    [categoryId: string]: number;
+}
 
 export interface TransactionStatistics {
     count: number;
     total: number;
     categorySubtotals: CategorySubtotal;
+    categoryExpenses: Transaction[];
+    categoryIncome: Transaction[];
 }

@@ -31,7 +31,7 @@ class Main extends React.Component<MainCompProps, {}> {
 
         return (
             <div className={"main row"}>
-                <div className="col-md-2">
+                <div className="col-md-3">
                     <AccountsComp />
                     <CategoriesComp />
                 </div>
@@ -44,7 +44,7 @@ class Main extends React.Component<MainCompProps, {}> {
                 }
 
                 {selectedAccount &&
-                <div className="col-md-6">
+                <div className="col-md-5">
                     <StatisticsComp/>
                 </div>
                 }

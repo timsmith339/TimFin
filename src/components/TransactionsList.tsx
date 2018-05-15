@@ -1,10 +1,10 @@
 import * as React from "react";
-import {Transaction, Account} from "../timfin-types";
+import {Transaction, Account, Category} from "../timfin-types";
 import {GlobalState} from "../redux/store";
 import {
     clearSelectedTransaction,
     getSelectedTransaction,
-    getTransactionsReversed,
+    getTransactionsReversed, loadTransaction,
     loadTransactions, removeTransaction,
     setSelectedTransaction, setTransactionSearchCriteria
 } from "../redux/transaction-module";
@@ -13,7 +13,18 @@ import * as moment from "moment";
 import * as tz from "moment-timezone";
 import {getSelectedAccount} from "../redux/account-module";
 import {Dispatch} from "redux";
-import {deleteTransaction, getTransactions, TransactionSearchCriteria} from "../lib/comms";
+import {
+    deleteTransaction,
+    getTransactions,
+    TransactionSearchCriteria,
+    updateCategory,
+    updateTransaction
+} from "../lib/comms";
+import * as Modal from "react-modal";
+import {MouseEvent} from "react";
+import EditCategory from "./EditCategory";
+import EditTransaction from "./EditTransaction";
+import {getCategories} from "../redux/category-module";
 
 interface TransactionsListCompProps extends TransactionsListCompOwnProps, TransactionsListDispatchProps {}
 
@@ -22,8 +33,10 @@ interface TransactionsListCompOwnProps {
     selectedAccount?: Account;
     selectedTransaction?: Transaction;
     transactionSearchCriteria: TransactionSearchCriteria;
+    categories: Category[];
 }
 interface TransactionsListDispatchProps {
+    loadTransaction: (transaction: Transaction) => void;
     loadTransactions: (transactions: Transaction[]) => void;
     setSelectedTransaction: (transaction: Transaction) => void;
     clearSelectedTransaction: () => void;
@@ -33,6 +46,7 @@ interface TransactionsListDispatchProps {
 
 interface TransactionListState {
     tz: string;
+    modalOpen: boolean;
 }
 
 class TransactionsList extends React.Component<TransactionsListCompProps, TransactionListState> {
@@ -41,10 +55,15 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
 
         this.state = {
             tz: tz.tz.guess(),
+            modalOpen: false
         };
 
         this.changedStartDate = this.changedStartDate.bind(this);
         this.changedEndDate = this.changedEndDate.bind(this);
+        this.openEditTransactionModal = this.openEditTransactionModal.bind(this);
+        this.closeEditModal = this.closeEditModal.bind(this);
+        this.onModalSubmit = this.onModalSubmit.bind(this);
+        this.deleteTransaction = this.deleteTransaction.bind(this);
     }
 
     componentWillMount() {
@@ -58,17 +77,29 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
     }
 
     setSelectedTransaction(transaction: Transaction) {
-        const { selectedTransaction } = this.props;
-
-        if (selectedTransaction && selectedTransaction.id === transaction.id) {
-            this.props.clearSelectedTransaction();
-            return;
-        }
-
         this.props.setSelectedTransaction(transaction);
+        // const { selectedTransaction } = this.props;
+        // if (selectedTransaction && selectedTransaction.id === transaction.id) {
+        //     this.props.clearSelectedTransaction();
+        // } else {
+        //     this.props.setSelectedTransaction(transaction);
+        // }
     }
 
+    openEditTransactionModal() {
+        this.setState({ modalOpen: true });
+    }
+    closeEditModal() {
+        this.setState({ modalOpen: false });
+    }
+    onModalSubmit(transaction: Transaction) {
+        this.setState({ modalOpen: false });
+        updateTransaction(transaction).then(newTransaction => {
+            this.props.loadTransaction(newTransaction);
+        });
+    }
     deleteTransaction(transaction: Transaction) {
+        this.setState({ modalOpen: false });
         deleteTransaction(transaction)
             .then(() => {
                 this.props.removeTransaction(transaction);
@@ -79,29 +110,19 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
     }
 
     buildRow(transaction: Transaction) {
-        const { selectedTransaction } = this.props;
         const { id, amount, timestamp, category, description } = transaction;
         const date = moment(timestamp)
             .tz(this.state.tz)
-            .format("MMM DD");
-        const isSelectedTransaction = selectedTransaction ? transaction.id === selectedTransaction.id : false;
+            .format("MMM D");
 
-        return <React.Fragment key={id}>
-            <tr onClick={this.setSelectedTransaction.bind(this, transaction)}
-                className={`transactions-list--row transaction`}>
-                <td className={"transactions-list--column"}>{ date }</td>
-                <td className={"transactions-list--column"}>{ category.name }</td>
-                <td className={"transactions-list--column"}>{ description }</td>
-                <td className={`transactions-list--column transaction--${transaction.transaction_type}`}>{ amount }</td>
-            </tr>
-            {isSelectedTransaction &&
-            <tr>
-                <td>
-                    <span onClick={this.deleteTransaction.bind(this, transaction)}>DELETE</span>
-                </td>
-            </tr>
-            }
-        </React.Fragment>;
+        return <tr key={id} onClick={this.setSelectedTransaction.bind(this, transaction)}
+                   className={`transactions-list--row transaction`}>
+            <td onClick={this.openEditTransactionModal.bind(this, transaction)}>📝</td>
+            <td className={"transactions-list--column"}>{ date }</td>
+            <td className={"transactions-list--column"}>{ category.name }</td>
+            <td className={"transactions-list--column"}>{ description }</td>
+            <td className={`transactions-list--column transaction--${transaction.transaction_type}`}>{ amount }</td>
+        </tr>;
     }
 
     changedStartDate(e: React.FormEvent<HTMLInputElement>) {
@@ -116,23 +137,47 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
     }
 
     render() {
-        const { transactions } = this.props;
+        const { transactions, selectedTransaction, categories } = this.props;
         const { startDate, endDate } = this.props.transactionSearchCriteria;
 
-        return <section>
-            <h2>Transactions</h2>
-            <div>
-                <input type={"date"} value={startDate.format("YYYY-MM-DD")} onChange={this.changedStartDate} />
-                <input type={"date"} value={endDate.format("YYYY-MM-DD")} onChange={this.changedEndDate} />
-            </div>
-            <table>
-                <tbody className={"transactions-list"}>
-                    {
-                        transactions.map((transaction) => this.buildRow(transaction))
-                    }
-                </tbody>
-            </table>
-        </section>;
+        return <React.Fragment>
+            <section>
+                <h2>Transactions</h2>
+                <div className="form-group row">
+                    <div className="col-xs-2">
+                        <input className="form-control form-control-sm" type={"date"} value={startDate.format("YYYY-MM-DD")} onChange={this.changedStartDate} />
+                    </div>
+                    <div className="col-xs-2">
+                        <input className="form-control form-control-sm" type={"date"} value={endDate.format("YYYY-MM-DD")} onChange={this.changedEndDate} />
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <td> </td>
+                            <td>Date</td>
+                            <td>Category</td>
+                            <td>Desc</td>
+                            <td>Amount</td>
+                        </tr>
+                    </thead>
+                    <tbody className={"transactions-list"}>
+                        {
+                            transactions.map((transaction) => this.buildRow(transaction))
+                        }
+                    </tbody>
+                </table>
+            </section>
+            <Modal isOpen={this.state.modalOpen}
+                   onRequestClose={this.closeEditModal}
+                   ariaHideApp={false}>
+                   <EditTransaction transaction={selectedTransaction}
+                                    categories={categories}
+                                    onSubmit={this.onModalSubmit}
+                                    onClose={this.closeEditModal}
+                                    onDelete={this.deleteTransaction} />
+            </Modal>
+        </React.Fragment>;
     }
 }
 
@@ -140,9 +185,11 @@ const mapStateToProps = (state: GlobalState) => ({
     transactions: getTransactionsReversed(state),
     selectedAccount: getSelectedAccount(state),
     selectedTransaction: getSelectedTransaction(state),
-    transactionSearchCriteria: state.transactions.searchCriteria
+    transactionSearchCriteria: state.transactions.searchCriteria,
+    categories: getCategories(state)
 });
 const mapDispatchToProps = (dispatch: Dispatch) => ({
+    loadTransaction(transaction: Transaction) { dispatch(loadTransaction(transaction)); },
     loadTransactions(transactions: Transaction[]) { dispatch(loadTransactions(transactions)); },
     setSelectedTransaction(transaction: Transaction) { dispatch(setSelectedTransaction(transaction)); },
     clearSelectedTransaction() { dispatch(clearSelectedTransaction()); },
