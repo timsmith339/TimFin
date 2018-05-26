@@ -17,14 +17,11 @@ import {
     deleteTransaction,
     getTransactions,
     TransactionSearchCriteria,
-    updateCategory,
     updateTransaction
 } from "../lib/comms";
 import * as Modal from "react-modal";
-import {MouseEvent} from "react";
-import EditCategory from "./EditCategory";
 import EditTransaction from "./EditTransaction";
-import {getCategories} from "../redux/category-module";
+import {getCategories, getSelectedCategory} from "../redux/category-module";
 
 interface TransactionsListCompProps extends TransactionsListCompOwnProps, TransactionsListDispatchProps {}
 
@@ -32,6 +29,7 @@ interface TransactionsListCompOwnProps {
     transactions: Transaction[];
     selectedAccount?: Account;
     selectedTransaction?: Transaction;
+    selectedCategory?: Category;
     transactionSearchCriteria: TransactionSearchCriteria;
     categories: Category[];
 }
@@ -64,6 +62,7 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
         this.closeEditModal = this.closeEditModal.bind(this);
         this.onModalSubmit = this.onModalSubmit.bind(this);
         this.deleteTransaction = this.deleteTransaction.bind(this);
+        this.buildRow = this.buildRow.bind(this);
     }
 
     componentWillMount() {
@@ -110,18 +109,20 @@ class TransactionsList extends React.Component<TransactionsListCompProps, Transa
     }
 
     buildRow(transaction: Transaction) {
+        const { selectedCategory } = this.props;
         const { id, amount, timestamp, category, description } = transaction;
         const date = moment(timestamp)
             .tz(this.state.tz)
             .format("MMM D");
+        const className = `transaction ${transaction.category.id === selectedCategory.id ? 'transaction--cat-active' : ''}`;
 
         return <tr key={id} onClick={this.setSelectedTransaction.bind(this, transaction)}
-                   className={`transactions-list--row transaction`}>
+                   className={className}>
             <td onClick={this.openEditTransactionModal.bind(this, transaction)}>📝</td>
-            <td className={"transactions-list--column"}>{ date }</td>
-            <td className={"transactions-list--column"}>{ category.name }</td>
-            <td className={"transactions-list--column"}>{ description }</td>
-            <td className={`transactions-list--column transaction--${transaction.transaction_type}`}>{ amount }</td>
+            <td className={""}>{ date }</td>
+            <td className={""}>{ category.name }</td>
+            <td className={""}>{ description }</td>
+            <td className={`transaction--${transaction.transaction_type}`}>{ amount }</td>
         </tr>;
     }
 
@@ -186,7 +187,8 @@ const mapStateToProps = (state: GlobalState) => ({
     selectedAccount: getSelectedAccount(state),
     selectedTransaction: getSelectedTransaction(state),
     transactionSearchCriteria: state.transactions.searchCriteria,
-    categories: getCategories(state)
+    categories: getCategories(state),
+    selectedCategory: getSelectedCategory(state)
 });
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     loadTransaction(transaction: Transaction) { dispatch(loadTransaction(transaction)); },

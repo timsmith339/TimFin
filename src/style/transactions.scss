@@ -23,6 +23,11 @@ table {
   &--credit {
     color: $positive-green;
   }
+
+  &--cat-active {
+    //font-style: italic;
+    color: deepskyblue;
+  }
 }
 
 
